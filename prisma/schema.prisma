@@ -1,0 +1,244 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              Int       @id @default(autoincrement())
+  name            String?
+  email           String?
+  role            String?   @default("user")
+  password        String?
+  emailVerifiedAt DateTime  @map("email_verified_at")
+  rememberToken   String?   @map("remember_token")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime? @map("updated_at")
+  deletedAt       DateTime? @map("deleted_at")
+  comments        Comment[]
+  views           View[]
+  author          Author?
+
+  @@map("users")
+}
+
+model role {
+  id        Int       @id @default(autoincrement())
+  name      String?
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("roles")
+}
+
+model Author {
+  id        Int       @id @default(autoincrement())
+  name      String?
+  bio       String?
+  avatar    String?
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int       @unique @map("user_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  posts     Post[]
+  seo       Seo?
+  image     Image?
+
+  @@map("authors")
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String?
+  description String?
+  slug        String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime? @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+  tags        Tag[]
+  seo         Seo?
+  image       Image?
+
+  @@map("categories")
+}
+
+model Tag {
+  id          Int       @id @default(autoincrement())
+  name        String?
+  slug        String?
+  description String?
+  Category    Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId  Int       @map("category_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime? @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+  posts       Post[]
+  seo         Seo?
+  image       Image?
+
+  @@map("tags")
+}
+
+model Post {
+  id          Int       @id @default(autoincrement())
+  title       String?
+  slug        String?
+  description String?
+  status      String?
+  h1          String?
+  tag         Tag?      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tagId       Int       @map("tag_id")
+  Author      Author?   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId    Int?      @map("author_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime? @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+  comments    Comment[]
+  views       View[]
+  contents    Content[]
+  images      Image[]
+  seo         Seo?
+
+  @@map("posts")
+}
+
+model Content {
+  id             Int              @id @default(autoincrement())
+  title          String?
+  content        String?
+  post           Post             @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId         Int              @map("post_id")
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime?        @map("updated_at")
+  deletedAt      DateTime?        @map("deleted_at")
+  specialSection SpecialSection[]
+
+  @@map("contents")
+}
+
+model SpecialSection {
+  id          Int       @id @default(autoincrement())
+  name        String?
+  description String?
+  url         String?
+  content     Content   @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  contentId   Int       @map("content_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime? @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+  image       Image[]
+
+  @@map("special_sections")
+}
+
+model Seo {
+  id                 Int       @id @default(autoincrement())
+  post               Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag                Tag?      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  category           Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  author             Author?   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  postId             Int?      @unique @map("post_id")
+  categoryId         Int?      @unique @map("category_id")
+  tagId              Int?      @unique @map("tag_id")
+  authorId           Int?      @unique @map("author_id")
+  metaTitle          String?
+  metaDescription    String?
+  metaKeywords       String?
+  canonical          String?
+  ogTitle            String?   @map("og_title")
+  ogDescription      String?   @map("og_description")
+  ogImage            String?   @map("og_image")
+  twitterTitle       String?   @map("twitter_title")
+  twitterDescription String?   @map("twitter_description")
+  twitterImage       String?   @map("twitter_image")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime? @map("updated_at")
+  deletedAt          DateTime? @map("deleted_at")
+
+  @@map("seos")
+}
+
+model Comment {
+  id        Int       @id @default(autoincrement())
+  content   String?
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int       @map("user_id")
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    Int       @map("post_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("comments")
+}
+
+model View {
+  id        Int       @id @default(autoincrement())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int       @map("user_id")
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    Int       @map("post_id")
+  ipAddress String?   @map("ip_address")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("views")
+}
+
+model FlashNews {
+  id        Int       @id @default(autoincrement())
+  title     String?
+  link      String?
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("flash_news")
+}
+
+model Contact {
+  id        Int       @id @default(autoincrement())
+  name      String?
+  email     String?
+  subject   String?
+  message   String?
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("contacts")
+}
+
+model Image {
+  id               Int             @id @default(autoincrement())
+  url              String?
+  alt              String?
+  // define foregin key to all tables
+  post             Post?           @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId           Int?            @map("post_id")
+  author           Author?         @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId         Int?            @unique @map("author_id")
+  category         Category?       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId       Int?            @unique @map("category_id")
+  tag              Tag?            @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tagId            Int?            @unique @map("tag_id")
+  specialSection   SpecialSection? @relation(fields: [specialSectionId], references: [id], onDelete: Cascade)
+  specialSectionId Int?            @map("special_section_id")
+  createdAt        DateTime?       @default(now()) @map("created_at")
+  updatedAt        DateTime?       @map("updated_at")
+  deletedAt        DateTime?       @map("deleted_at")
+
+  @@map("images")
+}
