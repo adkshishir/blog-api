@@ -27,7 +27,7 @@ model user {
   views           view[]
   roles           role[]
   posts           post[]
-  owner           owner[]
+  owner           owner?
 
   @@map("users")
 }
@@ -35,8 +35,8 @@ model user {
 model owner {
   id           Int           @id @default(autoincrement())
   post         post[]
-  user         user          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId       Int           @map("user_id")
+  user         user?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       Int?          @unique @map("user_id")
   socialMedia  socialMedia[]
   phone1       Int?
   phone2       Int?
