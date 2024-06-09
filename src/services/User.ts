@@ -13,15 +13,12 @@ class User {
           password: await bcrypt.hash(userData.password, 10),
           roles: {
             create: {
-              name: userData.role||null,
+              name: userData.role || null,
             },
           },
         },
       });
-      return {
-        status: 201,
-        message: 'User created successfully',
-      };
+      return user;
     } catch (error: any) {
       if (error.code === 'P2002') {
         throw {
@@ -29,7 +26,7 @@ class User {
           message: 'User already exists',
         };
       }
-      throw error;
+      throw { error: error };
     }
   }
   async login({ email, password }: { email: string; password: string }) {
@@ -43,44 +40,31 @@ class User {
       if (!availableUser) {
         throw {
           status: 404,
-          message: 'User not found',
+          message: 'Invalid credentials',
         };
       }
       // check if the password is correct
-      const isPasswordValid = bcrypt.compare(
+      const isPasswordValid = await bcrypt.compare(
         password,
         availableUser.password as string
       );
-
       if (!isPasswordValid) {
         throw {
           status: 400,
-          message: 'Invalid password',
-        };
-      }
-      const user = await prisma.user.findUnique({
-        where: {
-          email,
-        },
-      });
-      if (!user || user.password !== password) {
-        throw {
-          status: 400,
-          message: 'Invalid credentials',
+          message: 'Invalid Password',
         };
       }
       // generate jsonwebtoken
       const token = jwt.sign(
-        { id: user.id, email },
+        { id: availableUser.id, email },
         process.env.JWT_SECRET as string
       );
-      console.log(token);
       return {
         token,
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
+        availableUser: {
+          id: availableUser.id,
+          name: availableUser.name,
+          email: availableUser.email,
         },
       };
     } catch (error) {
