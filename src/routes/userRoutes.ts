@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import userController from '../controllers/userController';
+import userController from '../controllers/usersController';
 import userValidator from '../validators/userValidator';
 const router = Router();
 router.post(
