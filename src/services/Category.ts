@@ -1,3 +1,4 @@
+import { categoryType } from '../types';
 import prisma from './prisma';
 
 class Category {
@@ -21,38 +22,122 @@ class Category {
     });
     return category;
   }
-  async getCategoriesBySlug(slug: string) {
-    const categories = await prisma.category.findMany({
+  async getCategoryBySlug(slug: string) {
+    const categories = await prisma.category.findFirst({
+      orderBy: {
+        createdAt: 'desc',
+      },
       where: {
         slug: {
           equals: slug,
         },
       },
       select: {
-        tags: true,
+        tags: {
+          select: {
+            name: true,
+            slug: true,
+            id: true,
+          },
+        },
+        seo: {
+          select: {
+            metaTitle: true,
+            metaDescription: true,
+            metaKeywords: true,
+            canonical: true,
+            // ogTitle: true,
+            // ogDescription: true,
+            // twitterTitle: true,
+          },
+        },
         name: true,
         slug: true,
         id: true,
-        image: true,
+
+        image: {
+          select: {
+            url: true,
+            alt: true,
+          },
+        },
       },
     });
     return categories;
   }
 
-  async createCategory(data: any) {
-    const category = await prisma.category.create({
-      data,
-    });
-    return category;
+  async createCategory(data: categoryType) {
+    //   create url from image name
+    try {
+      const imageUrl = process.env.BASE_URL + '/uploads/' + data.image?.url;
+      let image: any = undefined;
+      if (data?.image) {
+        image = {
+          create: {
+            url: imageUrl,
+            alt: data.image.alt,
+          },
+        };
+      }
+
+      const category = await prisma.category.create({
+        data: {
+          name: data.name,
+          slug: data.slug,
+          description: data.description,
+          image: image,
+          seo: {
+            create: data.seo,
+          },
+        },
+      });
+      return category;
+    } catch (error: any) {
+      if (error.code === 'P2002') {
+        throw {
+          status: 400,
+          message: 'Category already exists',
+        };
+      }
+      throw error;
+    }
   }
-  async updateCategory(id: number, data: any) {
-    const category = await prisma.category.update({
-      where: {
-        id,
-      },
-      data,
-    });
-    return category;
+  async updateCategory(id: number, data: categoryType) {
+    try {
+      const imageUrl = process.env.BASE_URL + '/uploads/' + data.image?.url;
+      let image: any = undefined;
+      if (data?.image) {
+        image = {
+          create: {
+            url: imageUrl,
+            alt: data.image.alt,
+          },
+        };
+      }
+      const category = await prisma.category.update({
+        where: {
+          id,
+        },
+        data: {
+          name: data.name,
+          slug: data.slug,
+          description: data.description,
+          image: image,
+          seo: {
+            update: data.seo,
+          },
+        },
+      });
+      return category;
+    } catch (error: any) {
+      if (error.code === 'P2002') {
+        throw {
+          status: 400,
+          message: 'Category already exists',
+        };
+      }
+      throw error;
+    }
   }
 
   async deleteCategory(id: number) {
@@ -65,4 +150,4 @@ class Category {
   }
 }
 
-export default new Category()
+export default new Category();
