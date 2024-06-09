@@ -3,3 +3,4 @@
 /.env
 /.env.local
 /prisma/migrations/*
+/public/uploads
