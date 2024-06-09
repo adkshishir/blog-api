@@ -13,7 +13,7 @@ class User {
           password: await bcrypt.hash(userData.password, 10),
           roles: {
             create: {
-              name: userData.role || null,
+              name: userData.role || undefined,
             },
           },
         },
@@ -61,7 +61,7 @@ class User {
       );
       return {
         token,
-        availableUser: {
+        user: {
           id: availableUser.id,
           name: availableUser.name,
           email: availableUser.email,
