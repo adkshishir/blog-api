@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import Joi from 'joi';
+import response from '../helpers/formateResponse';
 
 const validateRegister = (req: Request, res: Response, next: NextFunction) => {
   const schema = Joi.object({
@@ -10,9 +11,7 @@ const validateRegister = (req: Request, res: Response, next: NextFunction) => {
 
   const { error } = schema.validate(req.body);
   if (error) {
-    return res
-      .status(400)
-      .json({ message: error.message, error: error.details });
+    return res.status(400).json(response(400, error.message, error.details));
   } else {
     next();
   }
@@ -22,12 +21,9 @@ const validateLogin = (req: Request, res: Response, next: NextFunction) => {
     email: Joi.string().email().required(),
     password: Joi.string().required(),
   });
-     console.log(req.body)
   const { error } = schema.validate(req.body);
   if (error) {
-    return res
-      .status(400)
-      .json({ message: error.message, error: error.details });
+    return res.status(400).json(response(400, error.message, error.details));
   } else {
     next();
   }
