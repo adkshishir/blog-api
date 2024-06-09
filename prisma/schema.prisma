@@ -16,9 +16,9 @@ datasource db {
 model user {
   id              Int       @id @default(autoincrement())
   name            String?
-  email           String @unique
+  email           String    @unique
   password        String?
-  emailVerifiedAt DateTime?  @map("email_verified_at")
+  emailVerifiedAt DateTime? @map("email_verified_at")
   rememberToken   String?   @map("remember_token")
   createdAt       DateTime  @default(now()) @map("created_at")
   updatedAt       DateTime? @map("updated_at")
@@ -72,9 +72,8 @@ model socialMedia {
 
 model role {
   id        Int       @id @default(autoincrement())
-  name      String?
-  user      user      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int       @map("user_id")
+  name      String?   @default("user")
+  user      user[]
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
