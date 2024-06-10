@@ -32,3 +32,45 @@ export type categoryType = {
     }
 
 }
+export type tagType = {
+    name?: string;
+    description?: string;
+    slug?: string;
+    categoryId: number
+    image?: {
+        url?: string
+        alt?: string
+    }
+    id?: number
+    seo?: {
+       metaTitle?: string
+       metaDescription?: string
+        metaKeywords?: string
+        canonical?: string
+       ogTitle?: string
+       ogDescription?: string
+       ogImage?: string
+       twitterTitle?: string
+       twitterDescription?: string
+        twitterImage?: string
+    }
+
+}
+export type profileType = {
+    userId: number
+    phone1: number
+    phone2: number
+    address: string
+    city: string
+    state: string
+    country: string
+    salesEmail: string
+    infoEmail: string
+    supportEmail: string
+    zipCode: string
+    website: string
+    socialMedia: {
+        url: string
+        alt: string
+    }[]
+}
