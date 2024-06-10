@@ -12,8 +12,8 @@ router.post(
   uploadImage,
   categoriesController.create
 );
-router.get('/categories/:slug', categoriesController.showBySlug);
-router.get('/categories/id/:id', categoriesController.show);
+router.get('/categories/slug/:slug', categoriesController.showBySlug);
+router.get('/categories/:id', categoriesController.show);
 router.delete(
   '/categories/:id',
   userMiddleware.checkAdmin,
