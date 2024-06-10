@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import Category from '../services/Category';
+import Category from '../services/category';
 import response from '../helpers/formateResponse';
 
 class categoryController {

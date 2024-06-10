@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import User from '../services/User';
+import User from '../services/user';
 import { userType } from '../types';
 import response from '../helpers/formateResponse';
 
