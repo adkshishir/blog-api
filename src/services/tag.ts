@@ -138,3 +138,4 @@ class Tag {
     }
   }
 }
+export default new Tag();
