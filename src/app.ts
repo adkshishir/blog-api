@@ -8,6 +8,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/auth', routes.userRoutes);
 app.use('/api', routes.categoryRoutes);
 app.use('/api', routes.tagRoutes);
+app.use('/api', routes.profileRoutes);
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, '../public')));
 
