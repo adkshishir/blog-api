@@ -37,6 +37,30 @@ class Tag {
         where: {
           slug,
         },
+        select: {
+          name: true,
+          slug: true,
+          id: true,
+          image: {
+            select: {
+              url: true,
+              alt: true,
+            },
+          },
+          seo: {
+            select: {
+              metaTitle: true,
+              metaDescription: true,
+              metaKeywords: true,
+              canonical: true,
+              // ogTitle: true,
+              // ogDescription: true,
+              // twitterTitle: true,
+              // twitterDescription: true,
+              // twitterImage: true,
+            },
+          },
+        },
       });
 
       if (!tag) {
@@ -67,7 +91,7 @@ class Tag {
         data: {
           name: data.name,
           slug: data.slug,
-          categoryId: data.categoryId,
+          categoryId: Number(data.categoryId),
           description: data.description,
           image: image,
           seo: {
@@ -105,7 +129,7 @@ class Tag {
         data: {
           name: data.name,
           slug: data.slug,
-          categoryId: data.categoryId,
+          categoryId: Number(data.categoryId),
           description: data.description,
           image: image,
           seo: {
