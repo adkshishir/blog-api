@@ -1,12 +1,24 @@
-
-import { Router } from "express";
-import tagsController from "../controllers/tagsController";
+import { Router } from 'express';
+import tagsController from '../controllers/tagsController';
+import userMiddleware from '../middleware/userMiddleware';
+import { uploadImage } from '../libs/multer/uploadImage';
+import tagValidator from '../validators/tagValidator';
 const router = Router();
 router.get('/tags', tagsController.index);
 router.get('/tags/:id', tagsController.show);
 router.get('/tags/slug/:slug', tagsController.showBySlug);
-router.post('/tags', tagsController.create);
-router.patch('/tags/:id', tagsController.update);
-router.delete('/tags/:id', tagsController.delete);
+router.post(
+  '/tags',
+  userMiddleware.checkAdmin,
+  uploadImage,
+  tagsController.create
+);
+router.patch(
+  '/tags/:id',
+  userMiddleware.checkAdmin,
+  uploadImage,
+  tagsController.update
+);
+router.delete('/tags/:id', userMiddleware.checkAdmin, tagsController.delete);
 const tagRoutes = router;
-export default tagRoutes
+export default tagRoutes;
