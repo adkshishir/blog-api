@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import response from '../helpers/formateResponse';
 import tag from '../services/tag';
+import tagValidator from '../validators/tagValidator';
 
 class tagsController {
   async index(req: Request, res: Response, next: NextFunction) {
@@ -31,18 +32,26 @@ class tagsController {
 
   async create(req: Request, res: Response, next: NextFunction) {
     try {
-      const createdTag = await tag.createTag(req.body);
+      tagValidator.validateCreateTag(req, res, next);
+      const createdTag = await tag.createTag({
+        ...req.body,
+        image: { url: req.file?.filename, alt: req.body.alt },
+      });
       res
         .status(201)
         .json(response(201, 'Tag created successfully', createdTag));
     } catch (error: any) {
+      console.log(error);
       res.status(400).json(response(400, error.message));
     }
   }
 
   async update(req: Request, res: Response, next: NextFunction) {
     try {
-      const updatedTag = await tag.updateTag(Number(req.params.id), req.body);
+      const updatedTag = await tag.updateTag(Number(req.params.id), {
+        ...req.body,
+        image: { url: req.file?.filename, alt: req.body.alt },
+      });
       res
         .status(200)
         .json(response(200, 'Tag updated successfully', updatedTag));
