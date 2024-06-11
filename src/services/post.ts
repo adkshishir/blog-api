@@ -237,6 +237,11 @@ class Post {
         }),
       };
     }
+    await prisma.image.deleteMany({
+      where: {
+        postId: Number(id),
+      },
+    });
     if (data.images) {
       images = {
         create: data.images.map((image: any, index: number) => {
