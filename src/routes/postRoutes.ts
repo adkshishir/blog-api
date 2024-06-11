@@ -11,12 +11,15 @@ router.get('/posts/slug/:slug', postController.showBySlug);
 router.post(
   '/posts',
   userMiddleware.checkAdmin,
-  upload.none(),
+  upload.fields([
+    { name: 'images' },
+    { name: 'specialSectionImages' },
+  ]),
   postController.create
 );
 router.patch(
   '/posts/:id',
-  upload.none(),
+  upload.fields([{ name: 'images' }, { name: 'specialSectionImages' }]),
   userMiddleware.checkAdmin,
   postController.update
 );
