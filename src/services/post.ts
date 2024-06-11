@@ -85,41 +85,40 @@ class Post {
     }
 
     if (data.contents) {
+      // console.log(data, 'data.contents');
       contents = {
-        createMany: {
-          ...data.contents.map((content: any, index: number) => {
-            let specialSection = undefined;
-            if (content?.specialSection) {
-              let image = undefined;
-              if (content?.specialSection?.image) {
-                image = {
-                  create: {
-                    url:
-                      process.env.BASE_URL +
-                      '/uploads/' +
-                      content?.specialSection?.image.url,
-                    alt: content?.specialSection?.image.alt,
-                  },
-                };
-              }
-              specialSection = {
+        create: data.contents.map((content: any, index: number) => {
+          let specialSection = undefined;
+          if (content?.specialSection) {
+            let image = undefined;
+            if (content?.specialSection?.image) {
+              image = {
                 create: {
-                  name: content?.specialSection?.name || undefined,
-                  description:
-                    content?.specialSection?.description || undefined,
-                  url: content?.specialSection?.url || undefined,
-                  image,
+                  url:
+                    process.env.BASE_URL +
+                    '/uploads/' +
+                    content?.specialSection?.image.url,
+                  alt: content?.specialSection?.image.alt,
                 },
               };
             }
-            return {
-              content: content?.content,
-              title: content?.title,
-              specialSection: specialSection,
+            specialSection = {
+              create: {
+                name: content?.specialSection?.name || undefined,
+                description: content?.specialSection?.description || undefined,
+                url: content?.specialSection?.url || undefined,
+                image,
+              },
             };
-          }),
-        },
+          }
+          return {
+            content: content?.content,
+            title: content?.title,
+            specialSection: specialSection,
+          };
+        }),
       };
+      console.log(contents, 'contents');
     }
     if (data.images) {
       images = {
@@ -151,14 +150,20 @@ class Post {
             id: Number(data.tagId),
           },
         },
-        seo: undefined,
-        images: undefined,
-        contents: undefined,
+        seo,
+        images,
+        contents: contents,
       },
     });
     return post;
   }
   async updatePost(id: number, data: any) {
+    //  delete the previous contents in the post
+    await prisma.content.deleteMany({
+      where: {
+        postId: Number(id),
+      },
+    });
     let images = undefined;
     let contents = undefined;
     // let specialSection = undefined;
@@ -172,39 +177,37 @@ class Post {
 
     if (data.contents) {
       contents = {
-        createMany: {
-          ...data.contents.map((content: any, index: number) => {
-            let specialSection = undefined;
-            if (content?.specialSection) {
-              let image = undefined;
-              if (content?.specialSection?.image) {
-                image = {
-                  create: {
-                    url:
-                      process.env.BASE_URL +
-                      '/uploads/' +
-                      content?.specialSection?.image.url,
-                    alt: content?.specialSection?.image.alt,
-                  },
-                };
-              }
-              specialSection = {
+        create: data.contents.map(async (content: any, index: number) => {
+          let specialSection = undefined;
+          if (content?.specialSection) {
+            let image = undefined;
+            if (content?.specialSection?.image) {
+              image = {
                 create: {
-                  name: content?.specialSection?.name || undefined,
-                  description:
-                    content?.specialSection?.description || undefined,
-                  url: content?.specialSection?.url || undefined,
-                  image,
+                  url:
+                    process.env.BASE_URL +
+                    '/uploads/' +
+                    content?.specialSection?.image.url,
+                  alt: content?.specialSection?.image.alt,
                 },
               };
             }
-            return {
-              content: content?.content,
-              title: content?.title,
-              specialSection: specialSection,
+            specialSection = {
+              create: {
+                name: content?.specialSection?.name || undefined,
+                description: content?.specialSection?.description || undefined,
+                url: content?.specialSection?.url || undefined,
+                image,
+              },
             };
-          }),
-        },
+            console.log(content);
+          }
+          return {
+            content: content?.content,
+            title: content?.title,
+            specialSection: specialSection,
+          };
+        }),
       };
     }
     if (data.images) {
@@ -229,6 +232,7 @@ class Post {
         description: data.description,
         status: data.status,
         h1: data.h1,
+
         user: {
           connect: {
             id: data.userId,
@@ -242,6 +246,11 @@ class Post {
         seo,
         images,
         contents,
+      },
+      include: {
+        seo: true,
+        images: true,
+        contents: true,
       },
     });
     return post;
