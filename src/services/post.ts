@@ -148,7 +148,7 @@ class Post {
         },
         tag: {
           connect: {
-            id: data.tagId,
+            id: Number(data.tagId),
           },
         },
         seo: undefined,
@@ -159,6 +159,66 @@ class Post {
     return post;
   }
   async updatePost(id: number, data: any) {
+    let images = undefined;
+    let contents = undefined;
+    // let specialSection = undefined;
+    let seo = undefined;
+
+    if (data.seo) {
+      seo = {
+        create: data.seo,
+      };
+    }
+
+    if (data.contents) {
+      contents = {
+        createMany: {
+          ...data.contents.map((content: any, index: number) => {
+            let specialSection = undefined;
+            if (content?.specialSection) {
+              let image = undefined;
+              if (content?.specialSection?.image) {
+                image = {
+                  create: {
+                    url:
+                      process.env.BASE_URL +
+                      '/uploads/' +
+                      content?.specialSection?.image.url,
+                    alt: content?.specialSection?.image.alt,
+                  },
+                };
+              }
+              specialSection = {
+                create: {
+                  name: content?.specialSection?.name || undefined,
+                  description:
+                    content?.specialSection?.description || undefined,
+                  url: content?.specialSection?.url || undefined,
+                  image,
+                },
+              };
+            }
+            return {
+              content: content?.content,
+              title: content?.title,
+              specialSection: specialSection,
+            };
+          }),
+        },
+      };
+    }
+    if (data.images) {
+      images = {
+        createMany: {
+          ...data.images.map((image: any, index: number) => {
+            return {
+              url: process.env.BASE_URL + '/uploads/' + image.url,
+              alt: image.alt,
+            };
+          }),
+        },
+      };
+    }
     const post = await prisma.post.update({
       where: {
         id: Number(id),
@@ -169,47 +229,19 @@ class Post {
         description: data.description,
         status: data.status,
         h1: data.h1,
-        userId: data.userId,
-        tagId: data.tagId,
-        seo: {
-          update: data.seo,
-        },
-        images: {
-          createMany: {
-            data: data.images.map((image: any, index: number) => {
-              return {
-                url: process.env.BASE_URL + '/uploads/' + image.url,
-                alt: image.alt,
-              };
-            }),
+        user: {
+          connect: {
+            id: data.userId,
           },
         },
-        contents: {
-          createMany: {
-            ...data.contents.map((content: any, index: number) => {
-              return {
-                content: content.content,
-                title: content.title,
-                specialSection: {
-                  create: {
-                    name: content.specialSection.name,
-                    description: content.specialSection.description,
-                    url: content.specialSection.url,
-                    image: {
-                      create: {
-                        url:
-                          process.env.BASE_URL +
-                          '/uploads/' +
-                          content.specialSection.image.url,
-                        alt: content.specialSection.image.alt,
-                      },
-                    },
-                  },
-                },
-              };
-            }),
+        tag: {
+          connect: {
+            id: Number(data.tagId),
           },
         },
+        seo,
+        images,
+        contents,
       },
     });
     return post;
