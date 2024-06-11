@@ -38,10 +38,23 @@ class postController {
     try {
       // get user id from token
       const decoded = findAuthorizedUser(req);
+      const files: any = req.files;
+      const images = files.images.map((image: any, index: number) => {
+        return { url: image.filename, alt: req.body.imagesAlt[index] };
+      });
+      const specialSectionImages = files.specialSectionImages.map(
+        (image: any, index: number) => {
+          return {
+            url: image.filename,
+            alt: req.body.specialSectionImagesAlt[index],
+          };
+        }
+      );
       const postInput: postType = req.body;
       const createdPost = await post.createPost({
         ...postInput,
-        image: { url: req.file?.filename, alt: req.body.alt },
+        images: images,
+        specialSectionImages: specialSectionImages,
         userId: Number(decoded?.id),
       });
       res
