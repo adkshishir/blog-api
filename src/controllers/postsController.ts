@@ -48,7 +48,6 @@ class postController {
         .status(200)
         .json(response(200, 'Post created successfully', createdPost));
     } catch (error: any) {
-      console.log(error);
       res.status(400).json(response(400, error.message));
     }
   }
@@ -56,8 +55,9 @@ class postController {
     try {
       // get user id from token
       const decoded = findAuthorizedUser(req);
+      const postInput: postType = req.body;
       const updatedPost = await post.updatePost(Number(req.params.id), {
-        ...req.body,
+        ...postInput,
         image: { url: req.file?.filename, alt: req.body.alt },
         userId: Number(decoded?.id),
       });
