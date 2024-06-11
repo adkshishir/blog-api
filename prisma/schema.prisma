@@ -133,7 +133,7 @@ model post {
   h1          String?
   user        user      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      Int       @map("user_id")
-  tag         tag?      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tag         tag       @relation(fields: [tagId], references: [id], onDelete: Cascade)
   tagId       Int       @map("tag_id")
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime? @map("updated_at")
