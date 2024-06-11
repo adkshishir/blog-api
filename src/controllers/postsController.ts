@@ -50,6 +50,7 @@ class postController {
           };
         }
       );
+
       const postInput: postType = req.body;
       const createdPost = await post.createPost({
         ...postInput,
@@ -69,9 +70,22 @@ class postController {
       // get user id from token
       const decoded = findAuthorizedUser(req);
       const postInput: postType = req.body;
+      const files: any = req.files;
+      const images = files.images.map((image: any, index: number) => {
+        return { url: image.filename, alt: req.body.imagesAlt[index] };
+      });
+      const specialSectionImages = files.specialSectionImages.map(
+        (image: any, index: number) => {
+          return {
+            url: image.filename,
+            alt: req.body.specialSectionImagesAlt[index],
+          };
+        }
+      );
       const updatedPost = await post.updatePost(Number(req.params.id), {
         ...postInput,
-        image: { url: req.file?.filename, alt: req.body.alt },
+        images: images,
+        specialSectionImages: specialSectionImages,
         userId: Number(decoded?.id),
       });
       res

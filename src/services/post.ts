@@ -91,14 +91,14 @@ class Post {
           let specialSection = undefined;
           if (content?.specialSection) {
             let image = undefined;
-            if (content?.specialSection?.image) {
+            if (data?.specialSectionImages[index]) {
               image = {
                 create: {
                   url:
                     process.env.BASE_URL +
                     '/uploads/' +
-                    content?.specialSection?.image.url,
-                  alt: content?.specialSection?.image.alt,
+                    data?.specialSectionImages[index].url,
+                  alt: data?.specialSectionImages[index].alt,
                 },
               };
             }
@@ -122,14 +122,12 @@ class Post {
     }
     if (data.images) {
       images = {
-        createMany: {
-          ...data.images.map((image: any, index: number) => {
-            return {
-              url: process.env.BASE_URL + '/uploads/' + image.url,
-              alt: image.alt,
-            };
-          }),
-        },
+        create: data.images.map((image: any, index: number) => {
+          return {
+            url: process.env.BASE_URL + '/uploads/' + image.url,
+            alt: image.alt,
+          };
+        }),
       };
     }
     const post = await prisma.post.create({
@@ -153,6 +151,36 @@ class Post {
         seo,
         images,
         contents: contents,
+      },
+      include: {
+        tag: true,
+        user: {
+          select: {
+            name: true,
+            id: true,
+          },
+        },
+        images: {
+          select: {
+            url: true,
+            alt: true,
+          },
+        },
+        seo: true,
+        contents: {
+          include: {
+            specialSection: {
+              include: {
+                image: {
+                  select: {
+                    url: true,
+                    alt: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
     return post;
@@ -181,14 +209,14 @@ class Post {
           let specialSection = undefined;
           if (content?.specialSection) {
             let image = undefined;
-            if (content?.specialSection?.image) {
+            if (data?.specialSectionImages[index]) {
               image = {
                 create: {
                   url:
                     process.env.BASE_URL +
                     '/uploads/' +
-                    content?.specialSection?.image.url,
-                  alt: content?.specialSection?.image.alt,
+                    data?.specialSectionImages[index].url,
+                  alt: data?.specialSectionImages[index].alt,
                 },
               };
             }
@@ -211,14 +239,12 @@ class Post {
     }
     if (data.images) {
       images = {
-        createMany: {
-          ...data.images.map((image: any, index: number) => {
-            return {
-              url: process.env.BASE_URL + '/uploads/' + image.url,
-              alt: image.alt,
-            };
-          }),
-        },
+        create: data.images.map((image: any, index: number) => {
+          return {
+            url: process.env.BASE_URL + '/uploads/' + image.url,
+            alt: image.alt,
+          };
+        }),
       };
     }
     const post = await prisma.post.update({
