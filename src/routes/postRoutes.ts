@@ -14,7 +14,12 @@ router.post(
   upload.none(),
   postController.create
 );
-router.patch('/posts/:id', userMiddleware.checkAdmin, postController.update);
+router.patch(
+  '/posts/:id',
+  upload.none(),
+  userMiddleware.checkAdmin,
+  postController.update
+);
 router.delete('/posts/:id', userMiddleware.checkAdmin, postController.delete);
 const postRoutes = router;
 export default postRoutes;
