@@ -90,10 +90,6 @@ export type postType = {
       name: string;
       description: string;
       url: string;
-      image: {
-        url: string;
-        alt: string;
-      };
     };
   }[];
   alt: string;
@@ -101,4 +97,8 @@ export type postType = {
     url: string;
     alt: string;
   };
+  specialSectionImages: {
+    url: string;
+    alt: string;
+  }[];
 };
