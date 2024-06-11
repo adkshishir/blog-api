@@ -200,7 +200,6 @@ class Post {
                 image,
               },
             };
-            console.log(content);
           }
           return {
             content: content?.content,
