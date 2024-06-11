@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import categoriesController from '../controllers/categoriesController';
-import { uploadImage } from '../libs/multer/uploadImage';
+import { upload } from '../libs/multer/uploadImage';
 import { validateCreateCategory } from '../validators/categoryValidator';
 import userMiddleware from '../middleware/userMiddleware';
 const router = Router();
@@ -9,7 +9,7 @@ router.post(
   '/categories',
   userMiddleware.checkAdmin,
   validateCreateCategory,
-  uploadImage,
+  upload.single('image'),
   categoriesController.create
 );
 router.get('/categories/slug/:slug', categoriesController.showBySlug);
@@ -22,7 +22,7 @@ router.delete(
 router.patch(
   '/categories/:id',
   userMiddleware.checkAdmin,
-  uploadImage,
+  upload.single('image'),
   categoriesController.update
 );
 
