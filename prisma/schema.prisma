@@ -28,6 +28,8 @@ model user {
   roles           role[]
   posts           post[]
   owner           owner?
+  bookings        booking[]
+  ownTrips        ownTrip[]
 
   @@map("users")
 }
@@ -48,6 +50,9 @@ model owner {
   country      String?
   zipCode      String?
   website      String?
+  logo         String?
+  progress     progress[]
+  footerLinks  footerLinks[]
   createdAt    DateTime      @default(now()) @map("created_at")
   updatedAt    DateTime?     @map("updated_at")
   deletedAt    DateTime?     @map("deleted_at")
@@ -55,11 +60,24 @@ model owner {
   @@map("owner_details")
 }
 
+model footerLinks {
+  id        Int       @id @default(autoincrement())
+  name      String?
+  url       String?
+  owner     owner     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId   Int       @map("user_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+}
+
 model progress {
   id          Int       @id @default(autoincrement())
   name        String?
   rating      Int?
   title       String?
+  owner       owner     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId     Int       @map("user_id")
   description String?
   avatar      image?
   link        String?
@@ -143,8 +161,34 @@ model post {
   contents    content[]
   images      image[]
   seo         seo?
+  bookings    booking[]
 
   @@map("posts")
+}
+
+model booking {
+  id        Int       @id @default(autoincrement())
+  user      user      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int       @map("user_id")
+  post      post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    Int       @map("post_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+}
+
+model ownTrip {
+  id          Int       @id @default(autoincrement())
+  name        String?
+  title       String?
+  number      Int?
+  country     String?
+  description String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime? @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+  user        user?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      Int?      @map("user_id")
 }
 
 model content {
