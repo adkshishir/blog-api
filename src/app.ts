@@ -26,7 +26,6 @@ app.use('/api', routes.postRoutes);
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, '../public')));
 app.listen(PORT, () => {
-  console.log(path.join(__dirname, '../public'));
   console.log('Server is running on port: ' + PORT);
 });
 

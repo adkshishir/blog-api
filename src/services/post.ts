@@ -118,7 +118,6 @@ class Post {
           };
         }),
       };
-      console.log(contents, 'contents');
     }
     if (data.images) {
       images = {
