@@ -32,7 +32,7 @@ class tagsController {
 
   async create(req: Request, res: Response, next: NextFunction) {
     try {
-      tagValidator.validateCreateTag(req, res, next);
+      // tagValidator.validateCreateTag(req, res, next);
       const createdTag = await tag.createTag({
         ...req.body,
         image: { url: req.file?.filename, alt: req.body.alt },
